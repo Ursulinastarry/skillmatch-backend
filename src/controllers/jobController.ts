@@ -191,7 +191,7 @@ export const JobController = {
         await client.query('COMMIT');
         
         return res.status(201).json({ 
-          message: 'Job created successfully',
+          message: 'Job created successfully.',
           job_id
         });
       } catch (error) {
