@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const bookController_1 = require("../controllers/bookController");
+// import { authMiddleware } from "../controllers/userController";
+const protect_1 = require("../middlewares/protect");
+// import { authenticateUser } from "../middlewares/protect";
+const router = express_1.default.Router();
+router.get("/", bookController_1.getAllBooks);
+router.get("/:id", bookController_1.getBookById);
+router.post("/", protect_1.protect, bookController_1.createBook);
+router.put("/:id", protect_1.protect, bookController_1.updateBook);
+router.patch("/:id", protect_1.protect, bookController_1.partialUpdateBook);
+router.delete("/:id", protect_1.protect, bookController_1.deleteBook);
+router.post("/borrow", protect_1.protect, bookController_1.borrowBook);
+router.post("/return", protect_1.protect, bookController_1.returnBook);
+router.get("/available", protect_1.protect, bookController_1.getAvailableCopies);
+router.get("/available/:id", protect_1.protect, bookController_1.getAvailableCopiesForBook);
+exports.default = router;
