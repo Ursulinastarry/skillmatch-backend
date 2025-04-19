@@ -1,0 +1,27 @@
+name: "Deploy skillmatch-backend to EC2"
+description: "Deploys the backend app to an EC2 instance via SSH"
+
+inputs:
+  ec2-host:
+    description: "Public IP or DNS of the EC2 instance"
+    required: true
+
+  ec2-username:
+    description: "SSH username (e.g. ec2-user, ubuntu)"
+    required: true
+
+  private-key:
+    description: "Private SSH key (.pem) content"
+    required: true
+
+  dist-folder:
+    description: "The folder containing deployable files"
+    required: true
+
+outputs:
+  website-url:
+    description: "The live link of the deployed backend"
+
+runs:
+  using: "node16"
+  main: "main.js"
