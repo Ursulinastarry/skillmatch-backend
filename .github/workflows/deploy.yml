@@ -18,4 +18,4 @@ jobs:
           ec2-host: ${{ secrets.EC2_HOST }}
           ec2-username: ${{ secrets.EC2_USER }}
           private-key: ${{ secrets.EC2_PRIVATE_KEY }}
-          dist-folder: './dist' # or whatever your backend folder is
+          dist-folder: './' # or whatever your backend folder is
