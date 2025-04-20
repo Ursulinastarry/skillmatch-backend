@@ -45,7 +45,6 @@ app.use('/jobs/:job_id/applications', applicationRoutes);
 app.use('/profiles',userProfileRoutes);
 app.use('/user-skills', userSkillsRoutes);
 app.use('/jobs/:job_id/job-skills', jobSkillsRoutes);
-app.use('/job-skills', jobSkillsRoutes);
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
