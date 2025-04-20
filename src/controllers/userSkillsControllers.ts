@@ -30,33 +30,26 @@ export const addUserSkill = asyncHandler(async (req: UserRequest, res: Response)
   }
   
   try {
-    // Check if skills exists 
-    const skillsResult = await pool.query(
-        'SELECT user_id FROM user_skills WHERE skill_id = $1',
-        [skillId]
-      );
-      
-      
-      // Check if user is the skills creator or admin
-      if (!req.user || skillsResult.rows[0].user_id !== req.user.user_id && req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-      
+   
+    
     // Check if the user already has this skill
     const existingSkill = await pool.query(
       'SELECT * FROM user_skills WHERE user_id = $1 AND skill_id = $2',
       [userId, skillId]
     );
-    
+      // Check if user is the skills creator or admin
+      if (!req.user || existingSkill.rows[0].user_id !== req.user.user_id && req.user.role_id !== 1) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+      
     if (existingSkill.rows.length > 0) {
       return res.status(400).json({ message: 'User already has this skill' });
     }
     
     const result = await pool.query(
-      'INSERT INTO user_skills (user_id, skill_id) VALUES ($1, $2) RETURNING *',
-      [userId, skillId]
-    );
-    
+        'INSERT INTO user_skills (user_id, skill_id) VALUES ($1, (SELECT id FROM skills WHERE id = $2)) RETURNING *',
+        [userId, skillId]
+      );
     res.status(201).json({ message: 'Skill added to user successfully' });
   } catch (error) {
     console.error('Error adding skill to user:', error);
