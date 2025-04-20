@@ -1,9 +1,10 @@
 import {  getJobApplications,getUserApplications,updateApplicationStatus } from "../controllers/applicationController"; 
 import express from "express";
+import { protect} from "../middlewares/protect";
 const router = express.Router();
 
-router.get("/",getJobApplications)
-router.get("/:user_id",  getUserApplications);
+router.get("/",protect,getJobApplications)
+router.get("/:user_id",protect,  getUserApplications);
 router.put("/:id", updateApplicationStatus);
 
 export default router;
