@@ -109,7 +109,7 @@ dotenv.config();
 export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
   console.log('Getting job by ID:');
 
-  const { id } = req.params;
+  const id = req.params.id;
   console.log('Getting job by ID:', id);
 
   try {
