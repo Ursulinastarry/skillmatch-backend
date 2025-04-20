@@ -107,10 +107,7 @@ dotenv.config();
 
 // Get job by ID
 export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
-  console.log('Getting job by ID:');
 
-  const id = req.params.id;
-  console.log('Getting job by ID:', id);
 
   try {
     const jobResult = await pool.query(
@@ -121,7 +118,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
         JOIN users u ON j.employer_id = u.user_id
         LEFT JOIN user_profiles up ON u.user_id = up.user_id
         WHERE j.id = $1`,
-      [id]
+      [req.params.id]
     );
     
     if (jobResult.rows.length === 0) {
@@ -134,7 +131,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
         FROM skills s
         JOIN job_skills js ON s.id = js.skill_id
         WHERE js.job_id = $1`,
-      [id]
+      [req.params.id]
     );
     
     const job = {
