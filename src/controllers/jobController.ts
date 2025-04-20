@@ -136,7 +136,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
     
     const job = {
       ...jobResult.rows[0],
-      skills: skillsResult.rows
+      skills: skillsResult.rows.length > 0 ? skillsResult.rows : []
     };
     
     return res.status(200).json(job);
