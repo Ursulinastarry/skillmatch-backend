@@ -204,14 +204,11 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
 })
  // Apply for a job
  export const applyJob = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const { job_id, cv_id } = req.body || {};
-  if (!job_id) {
-    return res.status(400).json({ error: 'Job ID is required' });
-  }
   if (!req.user) {
     return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
   }
- 
+  const { job_id, cv_id } = req.body;
+
   const user_id = req.user.user_id;
   
   try {
