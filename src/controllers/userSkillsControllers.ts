@@ -39,8 +39,10 @@ export const addUserSkill = asyncHandler(async (req: UserRequest, res: Response)
     );
       // Check if user is the skills creator or admin
     const user_id = existingSkill.rows[0]?.user_id;
-
-    if (!req.user || (user_id !== req.user.user_id && req.user.role_id !== 1)) {
+    if (!req.user) {
+        return res.status(403).json({ error: 'unauthorized' });
+      }
+    if (user_id !== req.user.user_id && req.user.role_id !== 1) {
       return res.status(403).json({ error: 'Forbidden' });
     }
       
