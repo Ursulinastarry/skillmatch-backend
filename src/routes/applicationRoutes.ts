@@ -2,8 +2,7 @@ import {  getJobApplications,getUserApplications,updateApplicationStatus } from 
 import express from "express";
 const router = express.Router();
 
-router.get("/:id",getJobApplications)
-router.get("/:user_id",  getUserApplications);
+
 router.put("/:id", updateApplicationStatus);
 
 export default router;
