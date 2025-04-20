@@ -11,12 +11,5 @@ export type Job = {
   }
   
   export interface JobRequest extends Request {
-    user?: {
-      user_id: number;
-      role_id: number;
-    };
-    params: {
-      id: string;
-    };
+   job?:Job
   }
-  

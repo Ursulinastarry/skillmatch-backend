@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response ,NextFunction} from 'express';
 import  pool  from '../server';
 import dotenv from 'dotenv';
 import { UserRequest } from '../utils/types/userTypes';
@@ -107,7 +107,7 @@ dotenv.config();
 })
 
 // Get job by ID
-export const getJobsById = asyncHandler(async (req: JobRequest, res: Response)=> {
+export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
 
 
   try {
