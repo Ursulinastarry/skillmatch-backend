@@ -121,7 +121,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
         WHERE j.id = $1`,
       [req.params.id]
     );
-    
+    console.log('Job result:', jobResult.rows);
     if (jobResult.rows.length === 0) {
       return res.status(404).json({ error: 'Job not found' });
     }
