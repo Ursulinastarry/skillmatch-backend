@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.get("/",protect,getJobApplications)
 router.get("/:user_id",protect,  getUserApplications);
-router.put("/:id", updateApplicationStatus);
+router.put("/:id", protect,updateApplicationStatus);
 
 export default router;
