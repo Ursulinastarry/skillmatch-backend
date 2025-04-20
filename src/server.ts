@@ -38,6 +38,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/applications", applicationRoutes);
+app.use('/jobs/:job_id/applications', applicationRoutes);
+
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
