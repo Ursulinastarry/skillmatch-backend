@@ -284,8 +284,13 @@ export const deleteJob = asyncHandler(async (req: UserRequest, res: Response)=> 
       return res.status(404).json({ error: 'Job not found' });
     }
     
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     // Check if user is the job creator or admin
-    if (!req.user || jobResult.rows[0].employer_id !== req.user.user_id && req.user.role_id !== 1) {
+    if (jobResult.rows[0].employer_id !== req.user.user_id && req.user.role_id !== 1) {
       return res.status(403).json({ error: 'Forbidden' });
     }
     
