@@ -108,7 +108,8 @@ dotenv.config();
 // Get job by ID
 export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
   const { id } = req.params;
-  
+  console.log('Getting job by ID:', id);
+
   try {
     const jobResult = await pool.query(
       `SELECT j.id, j.title, j.description, j.location, j.salary_range, 
@@ -138,7 +139,10 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
       ...jobResult.rows[0],
       skills: skillsResult.rows.length > 0 ? skillsResult.rows : []
     };
-    
+
+    console.log('Job result:', jobResult.rows);
+
+
     return res.status(200).json(job);
   } catch (error) {
     console.error('Error getting job:', error);
