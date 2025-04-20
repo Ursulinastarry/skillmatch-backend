@@ -4,6 +4,7 @@ import cors from 'cors';
 import userRoutes from "./routes/userRoutes";
 import jobRoutes from "./routes/jobRoutes";
 import applicationRoutes from "./routes/applicationRoutes";
+import userProfileRoutes from "./routes/userProfilesRoutes";
 import cookieParser from 'cookie-parser';
 import { Pool } from 'pg';
 import fs from 'fs';
@@ -39,7 +40,7 @@ app.use("/users", userRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/applications", applicationRoutes);
 app.use('/jobs/:job_id/applications', applicationRoutes);
-
+app.use('/profiles',userProfileRoutes)
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
