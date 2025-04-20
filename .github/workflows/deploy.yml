@@ -20,3 +20,5 @@ jobs:
           ec2-username: ${{ secrets.EC2_USER }}
           private-key: ${{ secrets.EC2_PRIVATE_KEY }}
           dist-folder: './' # or whatever your backend folder is
+          env-file: ${{ secrets.ENV_FILE }}
+

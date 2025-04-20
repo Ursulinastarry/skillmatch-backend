@@ -1,0 +1,10 @@
+import {  applyJob,getJobApplications,getUserApplications,updateApplicationStatus } from "../controllers/applicationController"; 
+import express from "express";
+const router = express.Router();
+
+router.post("/apply",applyJob);
+router.get("/:id",getJobApplications)
+router.get("/:user_id",  getUserApplications);
+router.put("/:id", updateApplicationStatus);
+
+export default router;

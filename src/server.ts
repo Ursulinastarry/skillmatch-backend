@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import express from "express";
 import cors from 'cors';
-import userRoutes from "./routes/userRoutes"
+import userRoutes from "./routes/userRoutes";
+import jobRoutes from "./routes/jobRoutes";
+import applicationRoutes from "./routes/applicationRoutes";
 import cookieParser from 'cookie-parser';
 import { Pool } from 'pg';
 import fs from 'fs';
@@ -33,8 +35,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/users", userRoutes)
-app.listen(port,'0.0.0.0', () => {
+app.use("/users", userRoutes);
+app.use("/jobs", jobRoutes);
+app.use("/applications", applicationRoutes);
+app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
 

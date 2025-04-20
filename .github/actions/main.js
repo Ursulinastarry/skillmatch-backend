@@ -10,13 +10,27 @@ async function run() {
     const username = core.getInput('ec2-username', { required: true });
     const privateKey = core.getInput('private-key', { required: true });
     const distFolder = core.getInput('dist-folder', { required: true });
+    const envFile = core.getInput('env-file'); // 👈 Get the .env content
 
-    // 🔐 Save key to a file
+    // 🔐 Save the SSH key
     const keyPath = path.join(__dirname, 'key.pem');
     fs.writeFileSync(keyPath, privateKey);
     fs.chmodSync(keyPath, '600');
 
-    // 📦 Compose the SSH command
+    // 📝 Create a temp .env file if it exists
+    const tempEnvPath = path.join(__dirname, '.env');
+    if (envFile) {
+      fs.writeFileSync(tempEnvPath, envFile);
+      console.log('✅ .env file created locally.');
+    }
+
+    // 📤 Upload the .env file to the EC2 instance (if provided)
+    if (envFile) {
+      await exec.exec(`scp -i ${keyPath} -o StrictHostKeyChecking=no ${tempEnvPath} ${username}@${host}:~/skillmatch-backend/.env`);
+      console.log('📨 .env file sent to EC2.');
+    }
+
+    // 🚀 Run remote commands
     const sshCmd = `
 ssh -o StrictHostKeyChecking=no -i ${keyPath} ${username}@${host} << 'EOF'
   cd ~/skillmatch-backend
@@ -26,10 +40,9 @@ ssh -o StrictHostKeyChecking=no -i ${keyPath} ${username}@${host} << 'EOF'
 EOF
 `;
 
-    // 🧠 Run the SSH command via bash
     await exec.exec('bash', ['-c', sshCmd]);
 
-    // 🌐 Output the URL
+    // 🌐 Output the backend URL
     const backendUrl = `http://${host}`;
     core.setOutput('website-url', backendUrl);
 

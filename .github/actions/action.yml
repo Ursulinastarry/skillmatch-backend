@@ -18,6 +18,10 @@ inputs:
     description: "The folder containing deployable files"
     required: true
 
+  env-file:
+    description: 'The .env content as a secret'
+    required: false
+
 outputs:
   website-url:
     description: "The live link of the deployed backend"
