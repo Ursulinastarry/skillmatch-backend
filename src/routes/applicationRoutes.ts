@@ -2,7 +2,6 @@ import {  applyJob,getJobApplications,getUserApplications,updateApplicationStatu
 import express from "express";
 const router = express.Router();
 
-router.post("/apply",applyJob);
 router.get("/:id",getJobApplications)
 router.get("/:user_id",  getUserApplications);
 router.put("/:id", updateApplicationStatus);

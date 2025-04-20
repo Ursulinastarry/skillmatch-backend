@@ -202,7 +202,74 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
     return res.status(500).json({ error: 'Server error' });
   }
 })
-
+ // Apply for a job
+ export const applyJob = asyncHandler(async (req: UserRequest, res: Response)=> {
+  const { job_id, cv_id } = req.body;
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+  }
+ 
+  const user_id = req.user.user_id;
+  
+  try {
+    // Check if job exists
+    const jobResult = await pool.query(
+      'SELECT * FROM jobs WHERE id = $1',
+      [job_id]
+    );
+    
+    if (jobResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    // Check if CV exists and belongs to user
+    if (cv_id) {
+      const cvResult = await pool.query(
+        'SELECT * FROM cvs WHERE id = $1 AND user_id = $2',
+        [cv_id, user_id]
+      );
+      
+      if (cvResult.rows.length === 0) {
+        return res.status(404).json({ error: 'CV not found or does not belong to user' });
+      }
+    }
+    
+    // Check if already applied
+    const existingApplication = await pool.query(
+      'SELECT * FROM applications WHERE job_id = $1 AND user_id = $2',
+      [job_id, user_id]
+    );
+    
+    if (existingApplication.rows.length > 0) {
+      return res.status(400).json({ error: 'You have already applied for this job' });
+    }
+    
+    // Create application
+    const result = await pool.query(
+      'INSERT INTO applications (job_id, user_id, cv_id) VALUES ($1, $2, $3) RETURNING id',
+      [job_id, user_id, cv_id]
+    );
+    
+    // Create notification for employer
+    await pool.query(
+      `INSERT INTO notifications (user_id, message, type) 
+       SELECT j.employer_id, 
+              CONCAT('New application for your job: ', j.title), 
+              'application'
+       FROM jobs j
+       WHERE j.id = $1`,
+      [job_id]
+    );
+    
+    return res.status(201).json({ 
+      message: 'Application submitted successfully',
+      application_id: result.rows[0].id
+    });
+  } catch (error) {
+    console.error('Error submitting application:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+})
 // Update job
 export const updateJob = asyncHandler(async (req: UserRequest, res: Response)=> {
   const { id } = req.params;
