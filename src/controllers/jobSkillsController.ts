@@ -13,7 +13,7 @@ export const getJobSkills = asyncHandler(async (req: UserRequest, res: Response)
       'SELECT s.* FROM skills s JOIN job_skills js ON s.id = js.skill_id WHERE js.job_id = $1',
       [jobId]
     );
-    
+    console.log("hob id", jobId);
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching job skills:', error);
