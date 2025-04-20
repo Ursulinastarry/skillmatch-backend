@@ -4,7 +4,7 @@ import { protect } from "../middlewares/protect";
 const router = express.Router();
 
 router.post("/post",protect,postJob);
-router.post("/apply/:id",applyJob);
+router.post("/apply",applyJob);
 router.get("/:employer_id",protect,getJobsByEmployer)
 router.get("/",  protect,getAllJobs);
 router.get("/:id", protect,getJobsById);
