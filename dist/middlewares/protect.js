@@ -33,7 +33,7 @@ exports.protect = (0, asyncHandler_1.default)(async (req, res, next) => {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET);
         console.log("Decoded JWT:", decoded); // Debugging log
         //get the user from database
-        const userQuery = await server_1.default.query("SELECT users.user_id , users.name, users.email, users.role_id, user_roles.role_name FROM users JOIN roles ON users.role_id = roles.role_id WHERE users.user_id = $1", [decoded.userId]);
+        const userQuery = await server_1.default.query("SELECT users.user_id , users.name, users.email, users.role_id, roles.name FROM users JOIN roles ON users.role_id = roles.id WHERE users.user_id = $1", [decoded.userId]);
         if (userQuery.rows.length === 0) {
             res.status(401).json({ message: "User not found" });
             return;
