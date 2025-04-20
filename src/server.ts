@@ -8,6 +8,8 @@ import userProfileRoutes from "./routes/userProfilesRoutes";
 import userSkillsRoutes from "./routes/userSkillsRoutes";
 import jobSkillsRoutes from "./routes/jobSkillsRoutes";
 import cvRoutes from "./routes/cvRoutes";
+import interviewRoutes from "./routes/interviewRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 import cookieParser from 'cookie-parser';
 import { Pool } from 'pg';
 import fs from 'fs';
@@ -47,6 +49,10 @@ app.use('/profiles',userProfileRoutes);
 app.use('/user-skills', userSkillsRoutes);
 app.use('/jobs/:job_id/job-skills', jobSkillsRoutes);
 app.use('/cvs', cvRoutes);
+app.use('/interviews', interviewRoutes);
+app.use('/jobs/:job_id/interviews', interviewRoutes);
+app.use('/notifications', notificationRoutes);
+
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
