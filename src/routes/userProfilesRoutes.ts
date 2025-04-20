@@ -4,11 +4,10 @@ import { createUserProfile, getUserProfileById, updateUserProfile, deleteUserPro
 const router = express.Router();
 
 router.get("/",protect,getUserProfiles);
-router.post("/:user_id",protect,createUserProfile)
-router.get("/:id",  protect,getUserProfileById);
+router.post("/",protect,createUserProfile)
+router.get("/:user_id",  protect,getUserProfileByUserId);
 router.put("/:id", protect,updateUserProfile);
 router.delete("/:id", protect,deleteUserProfile);
-router.get("/:user_id", protect,deleteUserProfile);
 
 
 export default router;
