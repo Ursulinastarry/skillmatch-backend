@@ -107,6 +107,8 @@ dotenv.config();
 
 // Get job by ID
 export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
+  console.log('Getting job by ID:');
+
   const { id } = req.params;
   console.log('Getting job by ID:', id);
 
