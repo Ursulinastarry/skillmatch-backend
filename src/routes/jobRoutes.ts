@@ -4,10 +4,10 @@ import { protect } from "../middlewares/protect";
 const router = express.Router();
 
 router.post("/post",protect,postJob);
-router.get("/:employer_id",getJobsByEmployer)
-router.get("/",  getAllJobs);
-router.get("/:id", getJobsById);
-router.put("/:id", updateJob);
-router.delete("/:id", deleteJob);
+router.get("/:employer_id",protect,getJobsByEmployer)
+router.get("/",  protect,getAllJobs);
+router.get("/:id", protect,getJobsById);
+router.put("/:id", protect,updateJob);
+router.delete("/:id", protect,deleteJob);
 
 export default router;
