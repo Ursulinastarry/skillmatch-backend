@@ -7,9 +7,9 @@ router.post("/post",protect,postJob);
 router.post("/apply",protect,applyJob);
 router.get("/:employer_id",protect,getJobsByEmployer)
 router.get("/",  protect,getAllJobs);
-router.get("/:id", protect,getJobsById);
 router.put("/:id", protect,updateJob);
 router.delete("/:id", protect,deleteJob);
+router.get("/:id", protect,getJobsById);
 
 
 export default router;
