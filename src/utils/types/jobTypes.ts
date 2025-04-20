@@ -1,6 +1,6 @@
 // types/job.ts
 export type Job = {
-    id: number
+    id: string
     title: string
     description: string
     location: string
@@ -10,13 +10,13 @@ export type Job = {
     updatedAt: Date
   }
   
-  export type JobRequest = {
-    params: any
-    id: number
-    title: string
-    description: string
-    location: string
-    salary_range: string
-    skills: string[]
+  export interface JobRequest extends Request {
+    user?: {
+      user_id: number;
+      role_id: number;
+    };
+    params: {
+      id: string;
+    };
   }
   
