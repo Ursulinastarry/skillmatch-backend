@@ -113,8 +113,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
   try {
     const jobResult = await pool.query(
       `SELECT * FROM jobs 
-      WHERE id = 3`,
-      [parseInt(req.params.id)]
+      WHERE id = 3`
     );
     console.log('Job result:', jobResult.rows);
     if (jobResult.rows.length === 0) {
@@ -124,8 +123,7 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
     // Get job skills
     const skillsResult = await pool.query(
       `SELECT * FROM job_skills 
-        WHERE job_id = 3`,
-      [parseInt(req.params.id)]
+        WHERE job_id = 3`
     );
     
     const job = {
