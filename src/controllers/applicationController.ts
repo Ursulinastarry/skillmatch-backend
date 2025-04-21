@@ -65,7 +65,7 @@ import { UserRequest } from '../utils/types/userTypes';
   // Get applications for a user
   export const getUserApplications= asyncHandler(async (req: UserRequest, res: Response)=> {
    
-    const user_id = parseInt(req.params.user_id);
+    const userId = parseInt(req.params.userId,10);
     if (!req.user) {
       return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
     }
@@ -80,7 +80,7 @@ import { UserRequest } from '../utils/types/userTypes';
          LEFT JOIN user_profiles up ON u.user_id = up.user_id
          WHERE a.user_id = $1
          ORDER BY a.applied_at DESC`,
-        [user_id]
+        [userId]
       );
       
       return res.status(200).json(result.rows);
