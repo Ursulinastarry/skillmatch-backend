@@ -123,10 +123,8 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
     
     // Get job skills
     const skillsResult = await pool.query(
-      `SELECT s.id, s.name
-        FROM skills s
-        JOIN job_skills js ON s.id = js.skill_id
-        WHERE js.job_id = $1`,
+      `SELECT * FROM job_skills 
+        WHERE job_id = $1`,
       [req.params.id]
     );
     
