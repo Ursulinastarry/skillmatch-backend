@@ -45,7 +45,7 @@ app.use("/jobs", jobRoutes);
 app.use("/applications", applicationRoutes);
 app.use('/profiles',userProfileRoutes);
 app.use('/user-skills', userSkillsRoutes);
-app.use('/jobs/:job_id/job-skills', jobSkillsRoutes);
+app.use('/job-skills', jobSkillsRoutes);
 app.use('/cvs', cvRoutes);
 app.use('/interviews', interviewRoutes);
 app.use('/jobs/:job_id/interviews', interviewRoutes);

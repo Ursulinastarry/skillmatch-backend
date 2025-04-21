@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const getJobSkills = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const { jobId } = req.params;
+  const jobId  = parseInt(req.params.jobId, 10);
   
   try {
     const result = await pool.query(
@@ -22,9 +22,9 @@ export const getJobSkills = asyncHandler(async (req: UserRequest, res: Response)
 });
 
 export const addJobSkill = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const { jobId } = req.params;
-  const { skillId } = req.body;
-  
+  const  jobId  = parseInt(req.params.jobId, 10);
+  const skillId = parseInt(req.body.skillId, 10);
+
   if (!skillId) {
     return res.status(400).json({ message: 'Skill ID is required' });
   }
@@ -68,8 +68,8 @@ export const addJobSkill = asyncHandler(async (req: UserRequest, res: Response)=
 });
 
 export const removeJobSkill = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const { jobId, skillId } = req.params;
-  
+  const  jobId  = parseInt(req.params.jobId, 10);
+  const skillId = parseInt(req.params.skillId, 10);
   try {
     // Check if job exists and user is the employer
     const jobResult = await pool.query(
