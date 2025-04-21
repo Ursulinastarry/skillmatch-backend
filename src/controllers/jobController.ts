@@ -3,6 +3,7 @@ import pool from '../server';
 import dotenv from 'dotenv';
 import { UserRequest } from '../utils/types/userTypes';
 import asyncHandler from '../middlewares/asyncHandler';
+import { JobRequest } from '../utils/types/jobTypes';
 dotenv.config();
 // Get all jobs
 export const getAllJobs = asyncHandler(async (req: Request, res: Response) => {
@@ -106,7 +107,7 @@ export const getAllJobs = asyncHandler(async (req: Request, res: Response) => {
 })
 
 // Get job by ID
-export const getJobsById = async (req: Request, res: Response)=> {
+export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
   try {
     console.log('ID from params:', req.params.id);
     console.log('ID type:', typeof req.params.id);
@@ -148,7 +149,7 @@ export const getJobsById = async (req: Request, res: Response)=> {
     console.error('Error getting job:', error);
     return res.status(500).json({ error: 'Server error' });
   }
-}
+})
 
 
 // Create job

@@ -9,13 +9,7 @@ router.get("/:employer_id",protect,getJobsByEmployer)
 router.get("/",  protect,getAllJobs);
 router.put("/:id", protect,updateJob);
 router.delete("/:id", protect,deleteJob);
-router.get("/:id", protect, async (req, res, next) => {
-	try {
-		await getJobsById(req, res);
-	} catch (err) {
-		next(err);
-	}
-});
+router.get("/:id", getJobsById);
 
 
 export default router;
