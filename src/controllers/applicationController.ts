@@ -8,13 +8,13 @@ import { UserRequest } from '../utils/types/userTypes';
 
   // Get applications for a job
   export const getJobApplications = asyncHandler(async (req: UserRequest, res: Response)=> {
-    const { job_id } = req.params;
+    const jobId = parseInt(req.params.jobId, 10);
     
     try {
       // Check if job exists and user is the employer
       const jobResult = await pool.query(
         'SELECT employer_id FROM jobs WHERE id = $1',
-        [job_id]
+        [jobId]
       );
       
       if (jobResult.rows.length === 0) {
@@ -36,7 +36,7 @@ import { UserRequest } from '../utils/types/userTypes';
          LEFT JOIN cvs c ON a.cv_id = c.id
          WHERE a.job_id = $1
          ORDER BY a.applied_at DESC`,
-        [job_id]
+        [jobId]
       );
       
       // Get applicant skills
@@ -46,7 +46,7 @@ import { UserRequest } from '../utils/types/userTypes';
            FROM skills s
            JOIN user_skills us ON s.id = us.skill_id
            WHERE us.user_id = $1`,
-          [application.user_id]
+          [application.userId]
         );
         
         return {
