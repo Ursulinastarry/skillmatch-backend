@@ -3,7 +3,6 @@ import pool from '../server';
 import dotenv from 'dotenv';
 import { UserRequest } from '../utils/types/userTypes';
 import asyncHandler from '../middlewares/asyncHandler';
-import { JobRequest } from '../utils/types/jobTypes';
 dotenv.config();
 // Get all jobs
 export const getAllJobs = asyncHandler(async (req: Request, res: Response) => {
@@ -107,6 +106,50 @@ export const getAllJobs = asyncHandler(async (req: Request, res: Response) => {
 })
 
 // Get job by ID
+export const getJobsById = async (req: Request, res: Response)=> {
+  try {
+    console.log('ID from params:', req.params.id);
+    console.log('ID type:', typeof req.params.id);
+    
+    // First try a count query to see if the job exists
+    const checkQuery = await pool.query(
+      `SELECT COUNT(*) FROM jobs WHERE id = $1`,
+      [req.params.id]
+    );
+    console.log('Count result:', checkQuery.rows[0]);
+    
+    const jobResult = await pool.query(
+      `SELECT * FROM jobs WHERE id = $1`,
+      [req.params.id]
+    );
+    console.log('Job result length:', jobResult.rows.length);
+    console.log('Job result data:', JSON.stringify(jobResult.rows));
+    if (jobResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Get job skills
+    const skillsResult = await pool.query(
+      `SELECT * FROM job_skills 
+        WHERE job_id = $1`,
+      [req.params.id]
+    );
+
+    const job = {
+      ...jobResult.rows[0],
+      skills: skillsResult.rows.length > 0 ? skillsResult.rows : []
+    };
+
+    console.log('Job result:', jobResult.rows);
+
+
+    return res.status(200).json(job);
+  } catch (error) {
+    console.error('Error getting job:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
 
 // Create job
 export const postJob = asyncHandler(async (req: UserRequest, res: Response) => {
