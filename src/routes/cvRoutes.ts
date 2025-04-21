@@ -4,7 +4,7 @@ import { protect } from "../middlewares/protect";
 const router = express.Router();
 
 router.post("/",protect,createCv);
-router.get("/:user_id",protect,getUserCvs)
+router.get("/:userId",protect,getUserCvs)
 router.get("/",  protect,getCvs);
 router.put("/:id", protect,updateCv);
 router.delete("/:id", protect,deleteCv);

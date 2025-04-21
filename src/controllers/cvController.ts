@@ -15,7 +15,7 @@ export const getCvs = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getCvById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = parseInt(req.params.id, 10);
   
   try {
     const result = await pool.query('SELECT * FROM cvs WHERE id = $1', [id]);
@@ -32,7 +32,7 @@ export const getCvById = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getUserCvs = asyncHandler(async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const userId = parseInt(req.params.userId, 10);
   
   try {
     const result = await pool.query('SELECT * FROM cvs WHERE user_id = $1', [userId]);
@@ -64,7 +64,7 @@ export const createCv = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const updateCv = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { id } = req.params;
+  const id  = parseInt(req.params.id, 10);
   const { file_url } = req.body;
   
   if (!file_url) {
@@ -97,7 +97,7 @@ export const updateCv = asyncHandler(async (req: UserRequest, res: Response) => 
 });
 
 export const deleteCv = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { id } = req.params;
+  const id = parseInt(req.params.id, 10);
   
   try {
     // Verify the user is the owner of the CV
@@ -106,7 +106,7 @@ export const deleteCv = asyncHandler(async (req: UserRequest, res: Response) => 
       }
       const ownershipCheck = await pool.query('SELECT * FROM cvs WHERE id = $1 AND user_id = $2', [id, req.user.user_id]);
       if (ownershipCheck.rows.length === 0) {
-        return res.status(403).json({ message: 'You are not authorized to update this CV' });
+        return res.status(403).json({ message: 'You are not authorized to delete this CV' });
       }
     const result = await pool.query('DELETE FROM cvs WHERE id = $1 RETURNING *', [id]);
     
