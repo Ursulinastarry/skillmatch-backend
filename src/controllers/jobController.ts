@@ -107,19 +107,24 @@ export const getAllJobs = asyncHandler(async (req: Request, res: Response) => {
 })
 
 // Get job by ID
-export const getJobsById = asyncHandler(async (req: Request, res: Response) => {
-
-
+export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
   try {
-    const jobResult = await pool.query(
-      `SELECT * FROM jobs 
-      WHERE id = $1`,
+    console.log('ID from params:', req.params.id);
+    console.log('ID type:', typeof req.params.id);
+    
+    // First try a count query to see if the job exists
+    const checkQuery = await pool.query(
+      `SELECT COUNT(*) FROM jobs WHERE id = $1`,
       [req.params.id]
     );
-    console.log('Request ID:', req.params.id);
-    console.log('Request ID type:', typeof req.params.id);
-    console.log('SQL query:', `SELECT * FROM jobs WHERE id = ${req.params.id}`);
-    console.log('Job result:', jobResult.rows);
+    console.log('Count result:', checkQuery.rows[0]);
+    
+    const jobResult = await pool.query(
+      `SELECT * FROM jobs WHERE id = $1`,
+      [req.params.id]
+    );
+    console.log('Job result length:', jobResult.rows.length);
+    console.log('Job result data:', JSON.stringify(jobResult.rows));
     if (jobResult.rows.length === 0) {
       return res.status(404).json({ error: 'Job not found' });
     }
