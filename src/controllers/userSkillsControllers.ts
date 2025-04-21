@@ -6,7 +6,7 @@ import { UserRequest } from '../utils/types/userTypes';
 dotenv.config();
 
 export const getUserSkills = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const  userId  = parseInt(req.params.user_id,10);
+  const  userId  = parseInt(req.params.userId,10);
   
   try {
     const result = await pool.query(
@@ -22,8 +22,8 @@ export const getUserSkills = asyncHandler(async (req: UserRequest, res: Response
 });
 
 export const addUserSkill = asyncHandler(async (req: UserRequest, res: Response)=> {
-  const  userId  = parseInt(req.params.user_id,10);
-  const skillId= parseInt(req.body.skill_id,10);
+  const  userId  = parseInt(req.params.userId,10);
+  const skillId= parseInt(req.body.skillId,10);
   
   if (!skillId) {
     return res.status(400).json({ message: 'Skill ID is required' });
