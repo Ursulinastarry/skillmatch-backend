@@ -62,17 +62,10 @@ export const addUserSkill = asyncHandler(async (req: UserRequest, res: Response)
 });
 
 export const removeUserSkill =asyncHandler(async (req: UserRequest, res: Response)=> {
-  const { userId, skillId } = req.params;
-  
+  const userId = parseInt(req.params.userId, 10);
+  const skillId = parseInt(req.params.skillId, 10);
   try {
-    const skillsResult = await pool.query(
-        'SELECT user_id FROM user_skills WHERE skill_id = $1',
-        [skillId]
-      );
-      
-      
-      // Check if user is the skills creator or admin
-      if (!req.user || skillsResult.rows[0].user_id !== req.user.user_id && req.user.role_id !== 1) {
+      if (!req.user || req.user.user_id !== req.user.user_id && req.user.role_id !== 1) {
         return res.status(403).json({ error: 'Forbidden' });
       }
     const result = await pool.query(
