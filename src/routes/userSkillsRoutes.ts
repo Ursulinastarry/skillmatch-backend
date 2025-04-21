@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/:userId", protect, getUserSkills);
 router.post("/:userId", protect, addUserSkill);
-router.delete("/:id", protect, removeUserSkill);
+router.delete("/userId/:id", protect, removeUserSkill);
 
 
 export default router;
