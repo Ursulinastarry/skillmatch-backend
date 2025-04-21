@@ -3,8 +3,8 @@ import { protect } from "../middlewares/protect";
 import { addUserSkill, getUserSkills, removeUserSkill } from "../controllers/userSkillsControllers";
 const router = express.Router();
 
-router.get("/:user_id",protect,getUserSkills);
-router.post("/:user_id",protect,addUserSkill)
+router.get("/users/:userId",protect,getUserSkills);
+router.post("/users/:userId",protect,addUserSkill)
 router.delete("/:id", protect,removeUserSkill);
 
 
