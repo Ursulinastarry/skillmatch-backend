@@ -112,13 +112,8 @@ export const getJobsById = asyncHandler(async (req: Request, res: Response)=> {
 
   try {
     const jobResult = await pool.query(
-      `SELECT j.id, j.title, j.description, j.location, j.salary_range, 
-              j.created_at, j.updated_at, u.user_id as employer_id, 
-              up.full_name as employer_name, up.company_name
-      FROM jobs j
-      JOIN users u ON j.employer_id = u.user_id
-      LEFT JOIN user_profiles up ON u.user_id = up.user_id
-      WHERE j.id = $1`,
+      `SELECT * FROM jobs 
+      WHERE id = $1`,
       [req.params.id]
     );
     console.log('Job result:', jobResult.rows);
