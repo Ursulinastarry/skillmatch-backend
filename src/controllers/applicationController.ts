@@ -64,11 +64,11 @@ import { UserRequest } from '../utils/types/userTypes';
 
   // Get applications for a user
   export const getUserApplications= asyncHandler(async (req: UserRequest, res: Response)=> {
+   
+    const user_id = parseInt(req.params.user_id);
     if (!req.user) {
-        return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
-      }
-    const user_id = req.user.user_id;
-    
+      return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+    }
     try {
       const result = await pool.query(
         `SELECT a.id, a.status, a.applied_at, 
