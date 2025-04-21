@@ -8,7 +8,6 @@ import asyncHandler from "../middlewares/asyncHandler";
 
 //Auth middleware to protect routes 
 export const protect = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    console.log("Protect middleware called"); // Debugging log
     let token;
     // token = req.cookies.access_token; 
     //trying to get token from Authorization Header 

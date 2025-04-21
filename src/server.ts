@@ -48,7 +48,6 @@ app.use('/user-skills', userSkillsRoutes);
 app.use('/job-skills', jobSkillsRoutes);
 app.use('/cvs', cvRoutes);
 app.use('/interviews', interviewRoutes);
-app.use('/jobs/:job_id/interviews', interviewRoutes);
 app.use('/notifications', notificationRoutes);
 
 app.listen(3000,'0.0.0.0', () => {

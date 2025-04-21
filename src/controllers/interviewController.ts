@@ -19,11 +19,30 @@ export const getInterviews = asyncHandler(async (req: UserRequest, res: Response
 });
 
 export const getInterviewById = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { id } = req.params;
+  const id = parseInt(req.params.id, 10);
   
   try {
-    if (!req.user || req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
+    // Fetch the interview to get applicant_id and job_id
+    const interviewResult = await pool.query('SELECT * FROM interviews WHERE id = $1', [id]);
+    if (interviewResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    const interview = interviewResult.rows[0];
+
+    // Fetch the employer_id for the job
+    const jobResult = await pool.query('SELECT employer_id FROM jobs WHERE id = $1', [interview.job_id]);
+    const employerId = jobResult.rows.length > 0 ? jobResult.rows[0].employer_id : null;
+
+    // Only allow admin, the applicant, or the employer who created the interview
+    if (
+      !req.user ||
+      (
+        req.user.role_id !== 1 && // not admin
+        req.user.user_id !== interview.applicant_id && // not applicant
+        req.user.user_id !== employerId // not employer
+      )
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
     const result = await pool.query('SELECT * FROM interviews WHERE id = $1', [id]);
     
@@ -40,24 +59,31 @@ export const getInterviewById = asyncHandler(async (req: UserRequest, res: Respo
 
 export const getInterviewsByJob = asyncHandler(async (req: UserRequest, res: Response) => {
     
-  const { jobId } = req.params;
+  const jobId = parseInt(req.params.jobId, 10);
   
   try {
+    // Fetch the interview to get applicant_id and job_id
+    const interviewResult = await pool.query('SELECT * FROM interviews WHERE job_id = $1', [jobId]);
+    if (interviewResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    const interview = interviewResult.rows[0];
 
-    // Check if job exists and user is the employer
-    const jobResult = await pool.query(
-        'SELECT employer_id FROM jobs WHERE id = $1',
-        [req.params.id]
-      );
-      
-      if (jobResult.rows.length === 0) {
-        return res.status(404).json({ error: 'Job not found' });
-      }
-      
-      // Check if user is the job creator or admin
-      if (!req.user || jobResult.rows[0].employer_id !== req.user.user_id && req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
+    // Fetch the employer_id for the job
+    const jobResult = await pool.query('SELECT employer_id FROM jobs WHERE id = $1', [interview.job_id]);
+    const employerId = jobResult.rows.length > 0 ? jobResult.rows[0].employer_id : null;
+
+    // Only allow admin, the applicant, or the employer who created the interview
+    if (
+      !req.user ||
+      (
+        req.user.role_id !== 1 && // not admin
+        req.user.user_id !== interview.applicant_id && // not applicant
+        req.user.user_id !== employerId // not employer
+      )
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const result = await pool.query('SELECT * FROM interviews WHERE job_id = $1 ORDER BY scheduled_time', [jobId]);
 
     res.status(200).json(result.rows);
@@ -69,23 +95,31 @@ export const getInterviewsByJob = asyncHandler(async (req: UserRequest, res: Res
 });
 
 export const getInterviewsByApplicant = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { applicantId } = req.params;
+  const applicantId = parseInt(req.params.applicantId, 10);
   
   try {
-    // Check if job exists and user is the employer
-    const jobResult = await pool.query(
-        'SELECT user_id FROM applications WHERE id = $1',
-        [req.params.id]
-      );
-      
-      if (jobResult.rows.length === 0) {
-        return res.status(404).json({ error: 'applicant not found' });
-      }
-      
-      // Check if user is the job creator or admin
-      if (!req.user || jobResult.rows[0].user_id !== req.user.user_id && req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
+    // Fetch the interview to get applicant_id and job_id
+    const interviewResult = await pool.query('SELECT * FROM interviews WHERE applicant_id = $1', [applicantId]);
+    if (interviewResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    const interview = interviewResult.rows[0];
+
+    // Fetch the employer_id for the job
+    const jobResult = await pool.query('SELECT employer_id FROM jobs WHERE id = $1', [interview.job_id]);
+    const employerId = jobResult.rows.length > 0 ? jobResult.rows[0].employer_id : null;
+
+    // Only allow admin, the applicant, or the employer who created the interview
+    if (
+      !req.user ||
+      (
+        req.user.role_id !== 1 && // not admin
+        req.user.user_id !== interview.applicant_id && // not applicant
+        req.user.user_id !== employerId // not employer
+      )
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const result = await pool.query(
       'SELECT * FROM interviews WHERE applicant_id = $1 ORDER BY scheduled_time',
       [applicantId]
@@ -127,24 +161,32 @@ export const createInterview = asyncHandler(async (req: UserRequest, res: Respon
 });
 
 export const updateInterview = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { id } = req.params;
+  const id = parseInt(req.params.id, 10);
   const { scheduled_time, meeting_link, notes } = req.body;
   
   try {
-     // Check if job exists and user is the employer
-     const jobResult = await pool.query(
-        'SELECT employer_id FROM jobs WHERE id = $1',
-        [req.params.id]
-      );
-      
-      if (jobResult.rows.length === 0) {
-        return res.status(404).json({ error: 'Job not found' });
-      }
-      
-      // Check if user is the job creator or admin
-      if (!req.user || jobResult.rows[0].employer_id !== req.user.user_id && req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
+     // Fetch the interview to get applicant_id and job_id
+    const interviewResult = await pool.query('SELECT * FROM interviews WHERE id = $1', [id]);
+    if (interviewResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    const interview = interviewResult.rows[0];
+
+    // Fetch the employer_id for the job
+    const jobResult = await pool.query('SELECT employer_id FROM jobs WHERE id = $1', [interview.job_id]);
+    const employerId = jobResult.rows.length > 0 ? jobResult.rows[0].employer_id : null;
+
+    // Only allow admin, the applicant, or the employer who created the interview
+    if (
+      !req.user ||
+      (
+        req.user.role_id !== 1 && // not admin
+        req.user.user_id !== interview.applicant_id && // not applicant
+        req.user.user_id !== employerId // not employer
+      )
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const result = await pool.query(
       'UPDATE interviews SET scheduled_time = $1, meeting_link = $2, notes = $3 WHERE id = $4 RETURNING *',
       [scheduled_time, meeting_link, notes, id]
@@ -162,24 +204,32 @@ export const updateInterview = asyncHandler(async (req: UserRequest, res: Respon
 });
 
 export const deleteInterview = asyncHandler(async (req: UserRequest, res: Response) => {
-  const { id } = req.params;
+  const id  = parseInt(req.params.id, 10);
 
   
   try {
-     // Check if job exists and user is the employer
-     const jobResult = await pool.query(
-        'SELECT employer_id FROM jobs WHERE id = $1',
-        [req.params.id]
-      );
-      
-      if (jobResult.rows.length === 0) {
-        return res.status(404).json({ error: 'Job not found' });
-      }
-      
-      // Check if user is the job creator or admin
-      if (!req.user || jobResult.rows[0].employer_id !== req.user.user_id && req.user.role_id !== 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
+     // Fetch the interview to get applicant_id and job_id
+    const interviewResult = await pool.query('SELECT * FROM interviews WHERE id = $1', [id]);
+    if (interviewResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    const interview = interviewResult.rows[0];
+
+    // Fetch the employer_id for the job
+    const jobResult = await pool.query('SELECT employer_id FROM jobs WHERE id = $1', [interview.job_id]);
+    const employerId = jobResult.rows.length > 0 ? jobResult.rows[0].employer_id : null;
+
+    // Only allow admin, the applicant, or the employer who created the interview
+    if (
+      !req.user ||
+      (
+        req.user.role_id !== 1 && // not admin
+        req.user.user_id !== interview.applicant_id && // not applicant
+        req.user.user_id !== employerId // not employer
+      )
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const result = await pool.query('DELETE FROM interviews WHERE id = $1 RETURNING *', [id]);
     
     if (result.rows.length === 0) {
