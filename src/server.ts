@@ -43,7 +43,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/applications", applicationRoutes);
-app.use('/jobs/:job_id/applications', applicationRoutes);
 app.use('/profiles',userProfileRoutes);
 app.use('/user-skills', userSkillsRoutes);
 app.use('/jobs/:job_id/job-skills', jobSkillsRoutes);
