@@ -35,7 +35,8 @@ const pool = new Pool({
 app.use(cors({
   origin: "http://localhost:4200",
   methods: "GET, POST,PUT,PATCH,DELETE",
-  credentials: true //allows cookies and auth headers
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }))
 
 
