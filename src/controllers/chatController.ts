@@ -19,7 +19,7 @@ export const chatWithGPT = asyncHandler(async (req: Request, res: Response) => {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4", // or gpt-3.5-turbo
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: message }],
       }),
     });
