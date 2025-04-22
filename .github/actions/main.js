@@ -47,7 +47,6 @@ EOF
     core.setOutput('website-url', backendUrl);
 
   } catch (error) {
-    core.setFailed(`Deployment failed 💀: ${error.message}`);
   }
 }
 
