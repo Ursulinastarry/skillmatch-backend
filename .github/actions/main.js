@@ -35,8 +35,10 @@ async function run() {
 ssh -o StrictHostKeyChecking=no -i ${keyPath} ${username}@${host} << 'EOF'
   cd ~/skillmatch-backend
   git pull origin main
-  docker compose down
-  docker compose up -d --build
+ docker compose down
+docker compose build --no-cache
+docker compose up -d
+
 EOF
 `;
 
