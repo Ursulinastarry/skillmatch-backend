@@ -9,7 +9,7 @@ export const chatWithGemini = async (req: Request, res:Response) => {
   const { message } = req.body;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const result = await model.generateContent(message);
     const response = await result.response;
     const text = response.text();
