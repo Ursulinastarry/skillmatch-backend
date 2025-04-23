@@ -22,6 +22,8 @@ async function run() {
     if (envFile) {
       fs.writeFileSync(tempEnvPath, envFile);
       console.log('✅ .env file created locally.');
+      console.log('🔍 ENV CONTENT:', envFile);
+
     }
 
     // 📤 Upload the .env file to the EC2 instance (if provided)
