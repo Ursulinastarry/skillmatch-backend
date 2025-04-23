@@ -91,26 +91,20 @@ exports.getAllJobs = (0, asyncHandler_1.default)(async (req, res) => {
 });
 // Get job by ID
 exports.getJobsById = (0, asyncHandler_1.default)(async (req, res) => {
-    const { id } = req.params;
     try {
-        const jobResult = await server_1.default.query(`SELECT j.id, j.title, j.description, j.location, j.salary_range, 
-              j.created_at, j.updated_at, u.user_id as employer_id, 
-              up.full_name as employer_name, up.company_name
-        FROM jobs j
-        JOIN users u ON j.employer_id = u.user_id
-        LEFT JOIN user_profiles up ON u.user_id = up.user_id
-        WHERE j.id = $1`, [id]);
+        // First try a count query to see if the job exists
+        const checkQuery = await server_1.default.query(`SELECT COUNT(*) FROM jobs WHERE id = $1`, [req.params.id]);
+        console.log('Count result:', checkQuery.rows[0]);
+        const jobResult = await server_1.default.query(`SELECT * FROM jobs WHERE id = $1`, [req.params.id]);
         if (jobResult.rows.length === 0) {
             return res.status(404).json({ error: 'Job not found' });
         }
         // Get job skills
-        const skillsResult = await server_1.default.query(`SELECT s.id, s.name
-        FROM skills s
-        JOIN job_skills js ON s.id = js.skill_id
-        WHERE js.job_id = $1`, [id]);
+        const skillsResult = await server_1.default.query(`SELECT * FROM job_skills 
+        WHERE job_id = $1`, [req.params.id]);
         const job = {
             ...jobResult.rows[0],
-            skills: skillsResult.rows
+            skills: skillsResult.rows.length > 0 ? skillsResult.rows : []
         };
         return res.status(200).json(job);
     }
@@ -166,10 +160,10 @@ exports.postJob = (0, asyncHandler_1.default)(async (req, res) => {
 });
 // Apply for a job
 exports.applyJob = (0, asyncHandler_1.default)(async (req, res) => {
-    const { job_id, cv_id } = req.body;
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
     }
+    const { job_id, cv_id } = req.body;
     const user_id = req.user.user_id;
     try {
         // Check if job exists

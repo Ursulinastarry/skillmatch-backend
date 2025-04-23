@@ -10,10 +10,10 @@ dotenv_1.default.config();
 const asyncHandler_1 = __importDefault(require("../middlewares/asyncHandler"));
 // Get applications for a job
 exports.getJobApplications = (0, asyncHandler_1.default)(async (req, res) => {
-    const { job_id } = req.params;
+    const jobId = parseInt(req.params.jobId, 10);
     try {
         // Check if job exists and user is the employer
-        const jobResult = await server_1.default.query('SELECT employer_id FROM jobs WHERE id = $1', [job_id]);
+        const jobResult = await server_1.default.query('SELECT employer_id FROM jobs WHERE id = $1', [jobId]);
         if (jobResult.rows.length === 0) {
             return res.status(404).json({ error: 'Job not found' });
         }
@@ -29,13 +29,13 @@ exports.getJobApplications = (0, asyncHandler_1.default)(async (req, res) => {
          LEFT JOIN user_profiles up ON u.user_id = up.user_id
          LEFT JOIN cvs c ON a.cv_id = c.id
          WHERE a.job_id = $1
-         ORDER BY a.applied_at DESC`, [job_id]);
+         ORDER BY a.applied_at DESC`, [jobId]);
         // Get applicant skills
         const applications = await Promise.all(result.rows.map(async (application) => {
             const skillsResult = await server_1.default.query(`SELECT s.id, s.name
            FROM skills s
            JOIN user_skills us ON s.id = us.skill_id
-           WHERE us.user_id = $1`, [application.user_id]);
+           WHERE us.user_id = $1`, [application.userId]);
             return {
                 ...application,
                 skills: skillsResult.rows
@@ -50,10 +50,10 @@ exports.getJobApplications = (0, asyncHandler_1.default)(async (req, res) => {
 });
 // Get applications for a user
 exports.getUserApplications = (0, asyncHandler_1.default)(async (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
     }
-    const user_id = req.user.user_id;
     try {
         const result = await server_1.default.query(`SELECT a.id, a.status, a.applied_at, 
                 j.id as job_id, j.title, j.location, j.salary_range,
@@ -63,7 +63,7 @@ exports.getUserApplications = (0, asyncHandler_1.default)(async (req, res) => {
          JOIN users u ON j.employer_id = u.user_id
          LEFT JOIN user_profiles up ON u.user_id = up.user_id
          WHERE a.user_id = $1
-         ORDER BY a.applied_at DESC`, [user_id]);
+         ORDER BY a.applied_at DESC`, [userId]);
         return res.status(200).json(result.rows);
     }
     catch (error) {

@@ -9,6 +9,13 @@ const cors_1 = __importDefault(require("cors"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const jobRoutes_1 = __importDefault(require("./routes/jobRoutes"));
 const applicationRoutes_1 = __importDefault(require("./routes/applicationRoutes"));
+const userProfilesRoutes_1 = __importDefault(require("./routes/userProfilesRoutes"));
+const userSkillsRoutes_1 = __importDefault(require("./routes/userSkillsRoutes"));
+const jobSkillsRoutes_1 = __importDefault(require("./routes/jobSkillsRoutes"));
+const cvRoutes_1 = __importDefault(require("./routes/cvRoutes"));
+const interviewRoutes_1 = __importDefault(require("./routes/interviewRoutes"));
+const notificationRoutes_1 = __importDefault(require("./routes/notificationRoutes"));
+const chatRoutes_1 = __importDefault(require("./routes/chatRoutes"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const pg_1 = require("pg");
 const fs_1 = __importDefault(require("fs"));
@@ -28,15 +35,27 @@ const pool = new pg_1.Pool({
     },
 });
 app.use((0, cors_1.default)({
-    origin: "http://localhost:4200",
+    origin: "*",
     methods: "GET, POST,PUT,PATCH,DELETE",
-    credentials: true //allows cookies and auth headers
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    console.log("🔥 HEADERS:", req.headers);
+    next();
+});
 app.use("/users", userRoutes_1.default);
 app.use("/jobs", jobRoutes_1.default);
 app.use("/applications", applicationRoutes_1.default);
+app.use('/profiles', userProfilesRoutes_1.default);
+app.use('/user-skills', userSkillsRoutes_1.default);
+app.use('/job-skills', jobSkillsRoutes_1.default);
+app.use('/cvs', cvRoutes_1.default);
+app.use('/interviews', interviewRoutes_1.default);
+app.use('/notifications', notificationRoutes_1.default);
+app.use("/", chatRoutes_1.default);
 app.listen(3000, '0.0.0.0', () => {
     console.log(`Server is running on port: ${port}`);
 });

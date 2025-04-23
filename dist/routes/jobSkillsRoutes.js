@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const applicationController_1 = require("../controllers/applicationController");
+const jobSkillsController_1 = require("../controllers/jobSkillsController");
 const express_1 = __importDefault(require("express"));
 const protect_1 = require("../middlewares/protect");
 const router = express_1.default.Router();
-router.get("/user/:userId", protect_1.protect, applicationController_1.getUserApplications);
-router.get("/:jobId", protect_1.protect, applicationController_1.getJobApplications);
-router.put("/:id", protect_1.protect, applicationController_1.updateApplicationStatus);
+router.post("/:jobId", protect_1.protect, jobSkillsController_1.addJobSkill);
+router.get("/:jobId", jobSkillsController_1.getJobSkills);
+router.delete("/:jobId/:skillId", protect_1.protect, jobSkillsController_1.removeJobSkill);
 exports.default = router;
