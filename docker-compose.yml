@@ -10,8 +10,8 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    # volumes:
-    #   - ./src:/usr/src/app/src
+    volumes:
+      - ./src:/usr/src/app/src
     
     command: npm run dev
 
