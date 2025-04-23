@@ -58,7 +58,7 @@ app.use('/interviews', interviewRoutes);
 app.use('/notifications', notificationRoutes);
 app.use("/", chatRoutes);
 
-app.listen(3000,'0.0.0.0', () => {
+app.listen(80,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
 });
 
