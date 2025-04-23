@@ -47,16 +47,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/users", userRoutes);
-app.use("/jobs", jobRoutes);
-app.use("/applications", applicationRoutes);
-app.use('/profiles',userProfileRoutes);
-app.use('/user-skills', userSkillsRoutes);
-app.use('/job-skills', jobSkillsRoutes);
-app.use('/cvs', cvRoutes);
-app.use('/interviews', interviewRoutes);
-app.use('/notifications', notificationRoutes);
-app.use("/", chatRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/jobs", jobRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use('/api/profiles',userProfileRoutes);
+app.use('/api/user-skills', userSkillsRoutes);
+app.use('/api/job-skills', jobSkillsRoutes);
+app.use('/api/cvs', cvRoutes);
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use("/api/", chatRoutes);
 
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);
