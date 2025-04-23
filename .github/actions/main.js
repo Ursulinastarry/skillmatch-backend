@@ -22,7 +22,6 @@ async function run() {
     if (envFile) {
       fs.writeFileSync(tempEnvPath, envFile);
       console.log('✅ .env file created locally.');
-      console.log('🔍 ENV CONTENT:', envFile);
 
     }
 

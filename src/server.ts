@@ -33,7 +33,7 @@ const pool = new Pool({
 });
 
 app.use(cors({
-  origin: "*",
+  origin: "http://localhost:4200",
   methods: "GET, POST,PUT,PATCH,DELETE",
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
