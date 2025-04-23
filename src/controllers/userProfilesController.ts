@@ -33,6 +33,9 @@ export const getUserProfileById  = asyncHandler(async (req: UserRequest, res: Re
 });
 
 export const getUserProfileByUserId  = asyncHandler(async (req: UserRequest, res: Response)=> {
+    console.log("🎯 Hitting unprotected profile route");
+    
+  
   const { userId } = req.params;
   
   try {

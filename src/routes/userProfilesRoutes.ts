@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/",getUserProfiles);
 router.post("/",protect,createUserProfile)
-router.get("/users/:userId",  getUserProfileByUserId);
+router.get("/users/:userId", getUserProfileByUserId);
 router.put("/:id", protect,updateUserProfile);
 router.delete("/:id", protect,deleteUserProfile);
 
