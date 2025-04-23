@@ -51,7 +51,7 @@ app.use('/job-skills', jobSkillsRoutes);
 app.use('/cvs', cvRoutes);
 app.use('/interviews', interviewRoutes);
 app.use('/notifications', notificationRoutes);
-app.use("/chat", chatRoutes);
+app.use("/", chatRoutes);
 
 app.listen(3000,'0.0.0.0', () => {
   console.log(`Server is running on port: ${port}`);

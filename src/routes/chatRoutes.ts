@@ -4,6 +4,6 @@ import { chatWithGemini } from "../controllers/chatController";
 
 const router = express.Router();
 
-router.post("/", chatWithGemini);
+router.post("/chat", chatWithGemini);
 
 export default router;
