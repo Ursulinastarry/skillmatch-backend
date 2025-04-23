@@ -19,19 +19,18 @@ const generateToken = (res: Response, userId: string, roleId: number) => {
   try {
       const accessToken = jwt.sign({ userId, roleId }, jwtSecret, { expiresIn: "15m" });
       const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: "30d" });
-
       res.cookie("access_token", accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
-          sameSite: "strict",
-          maxAge: 15 * 60 * 1000, // 15 minutes
+        httpOnly: true,
+        secure: false, // false for dev (no HTTPS)
+        sameSite: "lax", // ✅ lax lets cookies in on GET/POST
+        maxAge: 15 * 60 * 1000,
       });
-
+      
       res.cookie("refresh_token", refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
-          sameSite: "strict",
-          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
       return { accessToken, refreshToken, expiresIn: 900 }; // 900s = 15min
