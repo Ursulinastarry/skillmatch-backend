@@ -129,7 +129,7 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
     
     // Fetch applicants for this job
     const applicationsQuery = await pool.query(
-      "SELECT  id, user_id as userId, job_id as jobId, status FROM applications WHERE job_id = $1",
+      "SELECT id, user_id as userId, job_id as jobId, status FROM applications WHERE job_id = $1",
       [jobId]
     );
     const applications: Application[] = applicationsQuery.rows;
@@ -145,22 +145,22 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
       
       // Get user details
       const userQuery = await pool.query(
-        "SELECT user_id , name, email FROM users WHERE user_id = $1",
+        "SELECT user_id, name, email FROM users WHERE user_id = $1",
         [application.userId]
       );
       
-      // Calculate match percentage
-      const matchScore = calculateSkillMatch(jobSkills, userSkills);
+      // Calculate match percentage based on skill names
+      const matchPercentage = calculateSkillMatch(jobSkills, userSkills);
       
       return {
         ...application,
         user: userQuery.rows[0],
-        matchPercentage: matchScore
+        matchPercentage
       };
     }));
     
     // Sort by match percentage (highest first)
-    applicantsWithMatches.sort((a, b) => (b.matchPercentage || 0) - (a.matchPercentage || 0));
+    applicantsWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
     
     res.json({
       jobId,
@@ -174,29 +174,24 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
   }
 };
 
-// Helper function to calculate skill match percentage
+// New function to calculate skill match percentage based on skill names
 function calculateSkillMatch(jobSkills: Skill[], userSkills: Skill[]): number {
-  if (!jobSkills.length) return 0;
+  if (jobSkills.length === 0) return 0;
   
-  let matchPoints = 0;
-  const totalPossiblePoints = jobSkills.length;
+  // Create arrays of skill names for easier comparison
+  const jobSkillNames = jobSkills.map(skill => skill.name.toLowerCase());
+  const userSkillNames = userSkills.map(skill => skill.name.toLowerCase());
   
-  // Create a map of user skills for easy lookup
-  const userSkillMap = new Map();
-  userSkills.forEach(skill => {
-    userSkillMap.set(skill.name.toLowerCase(), 1);
-  });
+  // Count how many job skills match with user skills
+  const matchedSkills = jobSkillNames.filter(jobSkill => 
+    userSkillNames.some(userSkill => userSkill === jobSkill)
+  );
   
-  // For each job skill, check if user has it
-  jobSkills.forEach(jobSkill => {
-    const jobSkillName = jobSkill.name.toLowerCase();
-    if (userSkillMap.has(jobSkillName)) {
-      matchPoints += 1;
-    }
-  });
+  // Calculate percentage
+  const matchPercentage = (matchedSkills.length / jobSkillNames.length) * 100;
   
-  // Calculate final percentage
-  return Math.round((matchPoints / totalPossiblePoints) * 100);
+  // Round to 2 decimal places
+  return Math.round(matchPercentage * 100) / 100;
 }
 
 // AI-enhanced skill suggestion for job seekers - protected route
