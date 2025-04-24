@@ -129,7 +129,7 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
     
     // Fetch applicants for this job
     const applicationsQuery = await pool.query(
-      "SELECT application_id as id, user_id as userId, job_id as jobId, status FROM applications WHERE job_id = $1",
+      "SELECT  id, user_id as userId, job_id as jobId, status FROM applications WHERE job_id = $1",
       [jobId]
     );
     const applications: Application[] = applicationsQuery.rows;
