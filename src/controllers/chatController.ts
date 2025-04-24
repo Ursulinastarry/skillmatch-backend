@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Request, Response } from "express";
-import { UserRequest } from "../utils/types/userTypes"; // Assuming you have an auth middleware for user requests
-import axios from "axios";
+import { UserRequest } from "../utils/types/userTypes";
+import pool from "../server";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,16 +11,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 interface Skill {
   id: number;
   name: string;
-  description?: string;
-  proficiency?: number; // Optional proficiency rating (1-5)
+
 }
 
-interface User {
-  id: number;
-  roleId: number;
-  name: string;
-  skills?: Skill[];
-}
 
 interface Job {
   id: number;
@@ -35,11 +28,10 @@ interface Application {
   userId: number;
   jobId: number;
   status: string;
-  user?: User;
   matchPercentage?: number;
 }
 
-// Main chat function for general AI interactions
+// Main chat function for general AI interactions - no authentication required
 export const chatWithGemini = async (req: Request, res: Response) => {
   const { message } = req.body;
 
@@ -56,26 +48,42 @@ export const chatWithGemini = async (req: Request, res: Response) => {
   }
 };
 
-// Career recommendations for job seekers based on their skills
-export const getCareerRecommendations = async (req: Request, res: Response) => {
+// Career recommendations for job seekers based on their skills - protected route
+export const getCareerRecommendations = async (req: UserRequest, res: Response) => {
   const userId = req.params.userId;
   
   try {
-    // Fetch user skills from API
-    const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${userId}`);
-    const userSkills: Skill[] = userSkillsResponse.data;
+    // Verify the user is authorized to access this data
+    if (!req.user || (req.user.user_id !== parseInt(userId) && req.user.role_id !== 1)) { // Assuming role_id 1 is admin
+      return res.status(403).json({ error: "Not authorized to access this resource" });
+    }
+    
+    // Fetch user skills directly from database
+    const userSkillsQuery = await pool.query(
+      "SELECT skill_id as id, name, description, proficiency FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+      [userId]
+    );
+    const userSkills: Skill[] = userSkillsQuery.rows;
     
     // Fetch user information to verify roleId
-    const userResponse = await axios.get(`http://100.26.102.129:80/api/users/${userId}`);
-    const user: User = userResponse.data;
+    const userQuery = await pool.query(
+      "SELECT user_id as id, role_id as roleId, name FROM users WHERE user_id = $1",
+      [userId]
+    );
+    
+    if (userQuery.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    const user: UserRequest = userQuery.rows[0];
     
     // Only provide recommendations for job seekers (roleId 3)
-    if (user.roleId !== 3) {
+    if (req.user.role_id !== 3) {
       return res.status(403).json({ error: "Career recommendations are only available for job seekers" });
     }
     
     // Create prompt for AI with user skills
-    const skillsList = userSkills.map(skill => `${skill.name}${skill.proficiency ? ` (Proficiency: ${skill.proficiency}/5)` : ''}`).join(', ');
+    const skillsList = userSkills.map(skill => `${skill.name}`).join(', ');
     
     const prompt = `Based on the following skills: ${skillsList}, provide career recommendations including:
     1. The top 5 job roles that match these skills
@@ -102,39 +110,51 @@ export const getCareerRecommendations = async (req: Request, res: Response) => {
   }
 };
 
-// Calculate match percentages between job applicants and job requirements
+// Calculate match percentages between job applicants and job requirements - protected route
 export const getJobApplicantMatches = async (req: UserRequest, res: Response) => {
   const jobId = req.params.jobId;
   
   try {
-    // Verify the requester is an employer (roleId 2)
-    const requesterId = req.user?.user_id; // Assuming you have authentication middleware
-    const requesterResponse = await axios.get(`http://100.26.102.129:80/api/users/${requesterId}`);
-    const requester: User = requesterResponse.data;
-    
-    if (requester.roleId !== 2) {
+    // Verify the requester is an employer (roleId 2) by checking the user attached from protect middleware
+    if (!req.user || req.user.role_id !== 2) {
       return res.status(403).json({ error: "Only employers can view applicant match percentages" });
     }
     
     // Fetch job details including required skills
-    const jobSkillsResponse = await axios.get(`http://100.26.102.129:80/api/job-skills/${jobId}`);
-    const jobSkills: Skill[] = jobSkillsResponse.data;
+    const jobSkillsQuery = await pool.query(
+      "SELECT skill_id as id, name, description, importance as proficiency FROM job_skills JOIN skills ON job_skills.skill_id = skills.id WHERE job_id = $1",
+      [jobId]
+    );
+    const jobSkills: Skill[] = jobSkillsQuery.rows;
     
     // Fetch applicants for this job
-    const applicationsResponse = await axios.get(`http://100.26.102.129:80/api/applications/${jobId}`);
-    const applications: Application[] = applicationsResponse.data;
+    const applicationsQuery = await pool.query(
+      "SELECT application_id as id, user_id as userId, job_id as jobId, status FROM applications WHERE job_id = $1",
+      [jobId]
+    );
+    const applications: Application[] = applicationsQuery.rows;
     
     // For each applicant, calculate match percentage
     const applicantsWithMatches = await Promise.all(applications.map(async (application) => {
       // Fetch applicant skills
-      const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${application.userId}`);
-      const userSkills: Skill[] = userSkillsResponse.data;
+      const userSkillsQuery = await pool.query(
+        "SELECT skill_id as id, name, description, proficiency FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+        [application.userId]
+      );
+      const userSkills: Skill[] = userSkillsQuery.rows;
+      
+      // Get user details
+      const userQuery = await pool.query(
+        "SELECT user_id as id, name, email FROM users WHERE user_id = $1",
+        [application.userId]
+      );
       
       // Calculate match percentage
       const matchScore = calculateSkillMatch(jobSkills, userSkills);
       
       return {
         ...application,
+        user: userQuery.rows[0],
         matchPercentage: matchScore
       };
     }));
@@ -164,25 +184,14 @@ function calculateSkillMatch(jobSkills: Skill[], userSkills: Skill[]): number {
   // Create a map of user skills for easy lookup
   const userSkillMap = new Map();
   userSkills.forEach(skill => {
-    userSkillMap.set(skill.name.toLowerCase(), skill.proficiency || 1);
+    userSkillMap.set(skill.name.toLowerCase(), 1);
   });
   
   // For each job skill, check if user has it
   jobSkills.forEach(jobSkill => {
     const jobSkillName = jobSkill.name.toLowerCase();
-    const jobSkillImportance = jobSkill.proficiency || 1; // Default to 1 if not specified
-    
     if (userSkillMap.has(jobSkillName)) {
-      const userProficiency = userSkillMap.get(jobSkillName);
-      
-      // Calculate match points based on proficiency
-      // If user meets or exceeds job requirement, full points
-      // Otherwise, partial points based on how close they are
-      if (userProficiency >= jobSkillImportance) {
-        matchPoints += 1;
-      } else {
-        matchPoints += userProficiency / jobSkillImportance;
-      }
+      matchPoints += 1;
     }
   });
   
@@ -190,14 +199,22 @@ function calculateSkillMatch(jobSkills: Skill[], userSkills: Skill[]): number {
   return Math.round((matchPoints / totalPossiblePoints) * 100);
 }
 
-// AI-enhanced skill suggestion for job seekers
-export const getSuggestedSkills = async (req: Request, res: Response) => {
+// AI-enhanced skill suggestion for job seekers - protected route
+export const getSuggestedSkills = async (req: UserRequest, res: Response) => {
   const userId = req.params.userId;
   
   try {
-    // Fetch user skills
-    const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${userId}`);
-    const userSkills: Skill[] = userSkillsResponse.data;
+    // Verify the user is authorized to access this data
+    if (!req.user || (req.user.user_id !== parseInt(userId) && req.user.role_id !== 1)) { // Assuming role_id 1 is admin
+      return res.status(403).json({ error: "Not authorized to access this resource" });
+    }
+    
+    // Fetch user skills directly from database
+    const userSkillsQuery = await pool.query(
+      "SELECT skill_id as id, name, description FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+      [userId]
+    );
+    const userSkills: Skill[] = userSkillsQuery.rows;
     
     // Create prompt for AI with user skills
     const skillsList = userSkills.map(skill => skill.name).join(', ');
