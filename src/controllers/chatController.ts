@@ -18,7 +18,7 @@ interface Skill {
 interface Job {
   id: number;
   title: string;
-  description: string;
+  description?: string;
   employerId: number;
   skills?: Skill[];
 }
