@@ -62,11 +62,11 @@ export const getCareerRecommendations = async (req: Request, res: Response) => {
   
   try {
     // Fetch user skills from API
-    const userSkillsResponse = await axios.get(`/api/user-skills/${userId}`);
+    const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${userId}`);
     const userSkills: Skill[] = userSkillsResponse.data;
     
     // Fetch user information to verify roleId
-    const userResponse = await axios.get(`/api/users/${userId}`);
+    const userResponse = await axios.get(`http://100.26.102.129:80/api/users/${userId}`);
     const user: User = userResponse.data;
     
     // Only provide recommendations for job seekers (roleId 3)
@@ -109,7 +109,7 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
   try {
     // Verify the requester is an employer (roleId 2)
     const requesterId = req.user?.user_id; // Assuming you have authentication middleware
-    const requesterResponse = await axios.get(`/api/users/${requesterId}`);
+    const requesterResponse = await axios.get(`http://100.26.102.129:80/api/users/${requesterId}`);
     const requester: User = requesterResponse.data;
     
     if (requester.roleId !== 2) {
@@ -117,17 +117,17 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
     }
     
     // Fetch job details including required skills
-    const jobSkillsResponse = await axios.get(`/api/job-skills/${jobId}`);
+    const jobSkillsResponse = await axios.get(`http://100.26.102.129:80/api/job-skills/${jobId}`);
     const jobSkills: Skill[] = jobSkillsResponse.data;
     
     // Fetch applicants for this job
-    const applicationsResponse = await axios.get(`/api/applications/${jobId}`);
+    const applicationsResponse = await axios.get(`http://100.26.102.129:80/api/applications/${jobId}`);
     const applications: Application[] = applicationsResponse.data;
     
     // For each applicant, calculate match percentage
     const applicantsWithMatches = await Promise.all(applications.map(async (application) => {
       // Fetch applicant skills
-      const userSkillsResponse = await axios.get(`/api/user-skills/${application.userId}`);
+      const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${application.userId}`);
       const userSkills: Skill[] = userSkillsResponse.data;
       
       // Calculate match percentage
@@ -196,7 +196,7 @@ export const getSuggestedSkills = async (req: Request, res: Response) => {
   
   try {
     // Fetch user skills
-    const userSkillsResponse = await axios.get(`/api/user-skills/${userId}`);
+    const userSkillsResponse = await axios.get(`http://100.26.102.129:80/api/user-skills/${userId}`);
     const userSkills: Skill[] = userSkillsResponse.data;
     
     // Create prompt for AI with user skills
