@@ -18,7 +18,7 @@ interface Skill {
 interface Job {
   id: number;
   title: string;
-  description?: string;
+  description: string;
   employerId: number;
   skills?: Skill[];
 }
@@ -60,14 +60,14 @@ export const getCareerRecommendations = async (req: UserRequest, res: Response) 
     
     // Fetch user skills directly from database
     const userSkillsQuery = await pool.query(
-      "SELECT skill_id as id, name, description, proficiency FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+      "SELECT skill_id as id, name FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
       [userId]
     );
     const userSkills: Skill[] = userSkillsQuery.rows;
     
     // Fetch user information to verify roleId
     const userQuery = await pool.query(
-      "SELECT user_id as id, role_id as roleId, name FROM users WHERE user_id = $1",
+      "SELECT user_id , role_id as roleId, name FROM users WHERE user_id = $1",
       [userId]
     );
     
@@ -122,7 +122,7 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
     
     // Fetch job details including required skills
     const jobSkillsQuery = await pool.query(
-      "SELECT skill_id as id, name, description, importance as proficiency FROM job_skills JOIN skills ON job_skills.skill_id = skills.id WHERE job_id = $1",
+      "SELECT skill_id as id, name FROM job_skills JOIN skills ON job_skills.skill_id = skills.id WHERE job_id = $1",
       [jobId]
     );
     const jobSkills: Skill[] = jobSkillsQuery.rows;
@@ -138,14 +138,14 @@ export const getJobApplicantMatches = async (req: UserRequest, res: Response) =>
     const applicantsWithMatches = await Promise.all(applications.map(async (application) => {
       // Fetch applicant skills
       const userSkillsQuery = await pool.query(
-        "SELECT skill_id as id, name, description, proficiency FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+        "SELECT skill_id as id, name FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
         [application.userId]
       );
       const userSkills: Skill[] = userSkillsQuery.rows;
       
       // Get user details
       const userQuery = await pool.query(
-        "SELECT user_id as id, name, email FROM users WHERE user_id = $1",
+        "SELECT user_id , name, email FROM users WHERE user_id = $1",
         [application.userId]
       );
       
@@ -211,7 +211,7 @@ export const getSuggestedSkills = async (req: UserRequest, res: Response) => {
     
     // Fetch user skills directly from database
     const userSkillsQuery = await pool.query(
-      "SELECT skill_id as id, name, description FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
+      "SELECT skill_id as id, name FROM user_skills JOIN skills ON user_skills.skill_id = skills.id WHERE user_id = $1",
       [userId]
     );
     const userSkills: Skill[] = userSkillsQuery.rows;
